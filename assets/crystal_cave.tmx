@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="9">
  <editorsettings>
   <export target="maps/OLDcrystal_cave.json" format="json"/>
  </editorsettings>
@@ -161,4 +161,23 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="4" name="players_zones">
+  <object id="1" name="startZone" x="96" y="336">
+   <point/>
+  </object>
+  <object id="2" name="endZone" x="1264" y="256">
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="5" name="enemy_spawn">
+  <object id="6" name="Spawn" type="Birdman" x="288" y="240">
+   <point/>
+  </object>
+  <object id="7" name="Spawn" type="Birdman" x="528" y="544">
+   <point/>
+  </object>
+  <object id="8" name="Spawn" type="Birdman" x="768" y="336">
+   <point/>
+  </object>
+ </objectgroup>
 </map>
