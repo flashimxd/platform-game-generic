@@ -32,6 +32,24 @@ class Play extends Phaser.Scene {
     this.setUpFollowUpCameraOn(player)
   }
 
+  finishDrawing(pointer, layer) {
+    this.line.x2 = pointer.worldX
+    this.line.y2 = pointer.worldY
+    
+    this.graphics.clear()
+    this.graphics.strokeLineShape(this.line)
+
+    this.tileHits = layer.getTilesWithinShape(this.line)
+    if(this.tileHits.length > 0) {
+      this.tileHits.forEach(tile => {
+        tile.index !== -1 && tile.setCollision(true)
+      })
+    }
+
+    this.drawDebug(layer)
+    this.plotting = false
+  }
+
   createPlayerCollider(player, { colliders }) {
     player.addCollider(colliders.platformsColliders)
   }
