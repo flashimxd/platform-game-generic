@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import initAnimations from './playerAnims'
+import initAnimations from './anims/playerAnims'
 import collidable from '../mixins/collidable'
 
 class Player extends Phaser.Physics.Arcade.Sprite {
@@ -36,10 +36,6 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   initEvents() {
     this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this)
   }
-
-  // addCollider(otherGameObject, callback) {
-  //   this.scene.physics.add.collider(this, otherGameObject, callback, null, this)
-  // }
 
   update() {
     const { left, right, space, up } = this.cursors

@@ -37,11 +37,9 @@ class Play extends Phaser.Scene {
   }
 
   createEnemiesCollider(enemies, { colliders }) {
-    enemies.forEach(enemy => {
-      enemy
-        .addCollider(colliders.platformsColliders)
-        .addCollider(colliders.player)
-    })
+    enemies
+      .addCollider(colliders.platformsColliders)
+      .addCollider(colliders.player)
   }
 
   getPlayerZones(playerZonesLayer) {
@@ -93,7 +91,7 @@ class Play extends Phaser.Scene {
     
     spawnLayers.map(spawnPoint => {
       const enemy =  new enemyTypes[spawnPoint.type](this, spawnPoint.x, spawnPoint.y)
-      enemy.add(enemy)
+      enemies.add(enemy)
     })
 
     return enemies
