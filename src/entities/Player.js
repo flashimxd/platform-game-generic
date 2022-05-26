@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import HealthBar from '../hud/HealthBar'
 import initAnimations from './anims/playerAnims'
 import collidable from '../mixins/collidable'
 
@@ -6,7 +7,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'player')
 
-    // adding the sprint context
+
+    // adding the sprite context
     scene.add.existing(this)
     // adding physics context
     scene.physics.add.existing(this)
@@ -23,8 +25,16 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.playerSpeed = 150
     this.jumpCount = 0
     this.consecutiveJumps = 1
+    this.hasBeenHit = false
+    this.bounceVelocity = 250
     this.cursors = this.scene.input.keyboard.createCursorKeys()
-
+    this.health = 100
+    this.hp = new HealthBar(
+      this.scene,
+      this.scene.config.leftTopCornerPosition.x + 5,
+      this.scene.config.leftTopCornerPosition.y + 5,
+      this.health
+    )
     this.setSize(20, 35)
     this.body.setGravityY(500)
     this.setCollideWorldBounds(true)
@@ -38,6 +48,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   }
 
   update() {
+    if(this.hasBeenHit) return
     const { left, right, space, up } = this.cursors
     const isOnFloor = this.body.onFloor()
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
@@ -71,6 +82,36 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     this.setVelocityX(0)
+  }
+
+  playDamageTween() {
+    return this.scene.tweens.add({
+      targets: this,
+      duration: 100,
+      repeat: -1,
+      tint: 0xffffff
+    })
+  }
+
+  bounceOff() {
+    this.body.touching.right ?
+      this.setVelocityX(-this.bounceVelocity, -this.bounceVelocity) :
+      this.setVelocityX(this.bounceVelocity)
+
+    setTimeout(() => this.setVelocityY(-this.bounceVelocity), 0)      
+  }
+
+  takesHit(inititator) {
+    if(this.hasBeenHit) return
+    this.hasBeenHit = true
+    this.bounceOff()
+    const hitAnim = this.playDamageTween()
+
+    this.scene.time.delayedCall(2000, () => { 
+      this.hasBeenHit = false
+      hitAnim.stop()
+      this.clearTint()
+    })
   }
 }
 
