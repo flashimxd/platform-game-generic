@@ -33,6 +33,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       this.scene,
       this.scene.config.leftTopCornerPosition.x + 5,
       this.scene.config.leftTopCornerPosition.y + 5,
+      1.7,
       this.health
     )
     this.setSize(20, 35)
@@ -107,6 +108,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.bounceOff()
     const hitAnim = this.playDamageTween()
 
+    this.health -= inititator.damage
+    this.hp.decrease(this.health)
     this.scene.time.delayedCall(2000, () => { 
       this.hasBeenHit = false
       hitAnim.stop()
