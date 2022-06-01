@@ -8,4 +8,13 @@ export default (anims) => {
     frameRate: 8,
     repeat: -1
   })
+  anims.create({
+    key: 'birdman-hurt',
+    frames: anims.generateFrameNumbers('birdman', {
+      start: 25,
+      end: 26
+    }),
+    frameRate: 8,
+    repeat: 0
+  })
 }

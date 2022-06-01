@@ -2,11 +2,12 @@ import Phaser from 'phaser'
 import HealthBar from '../hud/HealthBar'
 import initAnimations from './anims/playerAnims'
 import collidable from '../mixins/collidable'
+import anims from '../mixins/anims'
+import Projectiles from '../atacks/Projectiles'
 
 class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'player')
-
 
     // adding the sprite context
     scene.add.existing(this)
@@ -15,6 +16,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     // Mixins (I hate them)
      Object.assign(this, collidable)
+     Object.assign(this, anims)
+     // this = {...this, ...collidable}
 
     this.init()
     this.initEvents()
@@ -28,6 +31,10 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.hasBeenHit = false
     this.bounceVelocity = 250
     this.cursors = this.scene.input.keyboard.createCursorKeys()
+
+    this.lastDirection = Phaser.Physics.Arcade.FACING_RIGHT
+
+    this.projectiles = new Projectiles(this.scene)
     this.health = 100
     this.hp = new HealthBar(
       this.scene,
@@ -42,6 +49,11 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0.5, 1)
 
     initAnimations(this.scene.anims)
+
+    this.scene.input.keyboard.on('keydown-Q', () => {
+      this.play('throw', true)
+      this.projectiles.fireProjectile(this)
+    })
   }
 
   initEvents() {
@@ -55,15 +67,20 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
     const isUpJustDown = Phaser.Input.Keyboard.JustDown(up)
 
+    if(this.isPlayingAnims('throw')) {
+      return
+    }
+
     isOnFloor ?
       this.body.velocity.x !== 0 ? 
         this.play('run', true):
         this.play('idle', true) :
       this.play('jump', true)
  
-     if((isOnFloor || this.jumpCount < this.consecutiveJumps) && (isSpaceJustDown || isUpJustDown)) {
-      this.setVelocityY(-(this.playerSpeed * 1.8))
-      this.jumpCount++
+     if((isOnFloor || this.jumpCount < this.consecutiveJumps)
+      && (isSpaceJustDown || isUpJustDown)) {
+        this.setVelocityY(-(this.playerSpeed * 1.8))
+        this.jumpCount++
     }
 
     if(isOnFloor) {
@@ -71,12 +88,14 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     if(left.isDown) {
+      this.lastDirection = Phaser.Physics.Arcade.FACING_LEFT
       this.setVelocityX(-this.playerSpeed)
       this.setFlipX(true)
       return
     }
 
     if(right.isDown) {
+      this.lastDirection = Phaser.Physics.Arcade.FACING_RIGHT
       this.setVelocityX(this.playerSpeed)
       this.setFlipX(false)
       return
@@ -110,6 +129,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.health -= inititator.damage
     this.hp.decrease(this.health)
+    
     this.scene.time.delayedCall(2000, () => { 
       this.hasBeenHit = false
       hitAnim.stop()
