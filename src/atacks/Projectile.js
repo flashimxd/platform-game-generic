@@ -11,7 +11,7 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
     this.speed = 300
     this.range = 300
     this.traveledDistance = 0
-    this.damage = 10
+    this.damage = 30
     this.cooldown = 700
 
     this.body.setSize(this.width - 13, this.height - 20)
@@ -48,10 +48,12 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
     this.setVisible(isActive)
   }
 
-  fire(x, y) {
+  fire(x, y, anim) {
     this.activateProjectile(true)
     this.body.reset(x, y)
     this.setVelocityX(this.speed)
+
+    anim && this.play(anim, true)
   }
 }
 

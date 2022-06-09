@@ -17,9 +17,11 @@ class Play extends Phaser.Scene {
     const player = this.createPlayer(playerZonesLayer.start)
     const enemies = this.createEnemies(layers.enemySpawns, layers.platColliderLayer)
 
+    console.log('enemies.getProjectiles()', enemies.getProjectiles())
     this.createPlayerCollider(player, {
       colliders: {
-        platformsColliders: layers.platColliderLayer
+        platformsColliders: layers.platColliderLayer,
+        projectiles: enemies.getProjectiles()
       }
     })
 
@@ -54,7 +56,9 @@ class Play extends Phaser.Scene {
   }
 
   createPlayerCollider(player, { colliders }) {
-    player.addCollider(colliders.platformsColliders)
+    player
+      .addCollider(colliders.platformsColliders)
+      .addCollider(colliders.projectiles, this.onWeaponHit)
   }
 
   onPlayerCollision(enemy, player) {
@@ -62,6 +66,7 @@ class Play extends Phaser.Scene {
   }
 
   onWeaponHit(entity, source) {
+    console.log('on weapon hit', {entity, source})
     entity.takesHit(source)
   }
 
@@ -70,6 +75,7 @@ class Play extends Phaser.Scene {
       .addCollider(colliders.platformsColliders)
       .addCollider(colliders.player, this.onPlayerCollision)
       .addCollider(colliders.player.projectiles, this.onWeaponHit)
+      .addOverlap(colliders.player.meeleWeapon, this.onWeaponHit)
   }
 
   getPlayerZones(playerZonesLayer) {

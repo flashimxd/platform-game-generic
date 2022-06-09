@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="9">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="10">
  <editorsettings>
   <export target="maps/OLDcrystal_cave.json" format="json"/>
  </editorsettings>
@@ -177,6 +177,9 @@
    <point/>
   </object>
   <object id="8" name="Spawn" type="Birdman" x="768" y="336">
+   <point/>
+  </object>
+  <object id="9" name="Spawn" type="Snaky" x="512" y="336">
    <point/>
   </object>
  </objectgroup>

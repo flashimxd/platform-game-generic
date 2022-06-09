@@ -17,12 +17,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   init() {
     this.gravity = 500
-    this.speed = 50
+    this.speed = 60
     this.timeSinceLastTurn = 0
     this.maxPatrolDistance = 200
     this.currentPatrolDistance = 0
     this.damage = 10
-    this.health = 40
+    this.health = 100
     this.platformCollidersLayer = null
     this.rayGraphics = this.scene.add.graphics({ lineStyle: {
       width: 2,
@@ -30,8 +30,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }})
 
     this.body.setGravityY(500)
-    this.setSize(20, 45)
-    this.setOffset(10, 20)
     this.setCollideWorldBounds(true)
     this.setOrigin(0.5, 1)
     this.setVelocityX(this.speed)

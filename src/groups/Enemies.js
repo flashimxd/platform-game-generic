@@ -8,6 +8,19 @@ class Enemies extends Phaser.GameObjects.Group {
     Object.assign(this, collidable)
   }
 
+  getProjectiles() {
+    const projectiles = new Phaser.GameObjects.Group()
+
+    this.getChildren().forEach(enemy => {
+      console.log('all enemies', { enemy })
+      console.log('enemy.projectiles', enemy.projectiles)
+      // not all the enemies has projectiles ex[Birdman]
+      enemy.projectiles && projectiles.addMultiple(enemy.projectiles.getChildren())
+    })
+
+    return projectiles
+  }
+
   getTypes() {
     return ENEMY_TYPES
   }

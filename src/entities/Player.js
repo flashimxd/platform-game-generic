@@ -4,7 +4,8 @@ import initAnimations from './anims/playerAnims'
 import collidable from '../mixins/collidable'
 import anims from '../mixins/anims'
 import Projectiles from '../atacks/Projectiles'
-
+import MeeleWeapon from '../atacks/MeeleWeapon'
+import { getTimeStamp } from '../utils/functions'
 class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'player')
@@ -30,11 +31,14 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.consecutiveJumps = 1
     this.hasBeenHit = false
     this.bounceVelocity = 250
+    this.lastAtackTime = null
     this.cursors = this.scene.input.keyboard.createCursorKeys()
 
     this.lastDirection = Phaser.Physics.Arcade.FACING_RIGHT
 
-    this.projectiles = new Projectiles(this.scene)
+    this.projectiles = new Projectiles(this.scene, 'iceball-1')
+    this.meeleWeapon = new MeeleWeapon(this.scene, 0, 0, 'sword-default')
+
     this.health = 100
     this.hp = new HealthBar(
       this.scene,
@@ -52,7 +56,17 @@ class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.input.keyboard.on('keydown-Q', () => {
       this.play('throw', true)
-      this.projectiles.fireProjectile(this)
+      this.projectiles.fireProjectile(this, 'iceball')
+    })
+
+    this.scene.input.keyboard.on('keydown-E', () => {
+
+      if(this.lastAtackTime &&
+          this.lastAtackTime + this.meeleWeapon.attackSpeed > getTimeStamp()) return
+
+      this.play('throw', true)
+      this.meeleWeapon.attack(this)
+      this.lastAtackTime = getTimeStamp()
     })
   }
 
