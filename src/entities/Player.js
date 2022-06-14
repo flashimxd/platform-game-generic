@@ -6,6 +6,7 @@ import anims from '../mixins/anims'
 import Projectiles from '../atacks/Projectiles'
 import MeeleWeapon from '../atacks/MeeleWeapon'
 import { getTimeStamp } from '../utils/functions'
+import EventEmitter from '../events/Emitter'
 class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, 'player')
@@ -30,6 +31,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.jumpCount = 0
     this.consecutiveJumps = 1
     this.hasBeenHit = false
+    this.isSliding = false
     this.bounceVelocity = 250
     this.lastAtackTime = null
     this.cursors = this.scene.input.keyboard.createCursorKeys()
@@ -39,7 +41,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.projectiles = new Projectiles(this.scene, 'iceball-1')
     this.meeleWeapon = new MeeleWeapon(this.scene, 0, 0, 'sword-default')
 
-    this.health = 100
+    this.health = 20
     this.hp = new HealthBar(
       this.scene,
       this.scene.config.leftTopCornerPosition.x + 5,
@@ -53,7 +55,15 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0.5, 1)
 
     initAnimations(this.scene.anims)
+    this.handleAttacks()
+    this.handleMovements()
+  }
 
+  initEvents() {
+    this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this)
+  }
+
+  handleAttacks() {
     this.scene.input.keyboard.on('keydown-Q', () => {
       this.play('throw', true)
       this.projectiles.fireProjectile(this, 'iceball')
@@ -70,18 +80,35 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     })
   }
 
-  initEvents() {
-    this.scene.events.on(Phaser.Scenes.Events.UPDATE, this.update, this)
+  handleMovements() {
+    this.scene.input.keyboard.on('keydown-DOWN', () => {
+      if(!this.body.onFloor()) return
+      this.body.setSize(this.width, this.height / 2)
+      this.setOffset(0, this.height / 2)
+      this.setVelocityX(0)
+      this.play('slide', true)
+      this.isSliding = true
+    })
+    this.scene.input.keyboard.on('keyup-DOWN', () => {
+      this.body.setSize(this.width, 38)
+      this.setOffset(0, 0)
+      this.isSliding = false
+    })
   }
 
   update() {
-    if(this.hasBeenHit) return
+    if(this.hasBeenHit || this.isSliding || !this.body) return
+
+    if(this.getBounds().top > this.scene.config.height) {
+      EventEmitter.emit('PLAYER_LOSE')
+      return
+    }    
     const { left, right, space, up } = this.cursors
     const isOnFloor = this.body.onFloor()
     const isSpaceJustDown = Phaser.Input.Keyboard.JustDown(space)
     const isUpJustDown = Phaser.Input.Keyboard.JustDown(up)
 
-    if(this.isPlayingAnims('throw')) {
+    if(this.isPlayingAnims('throw') || this.isPlayingAnims('slide')) {
       return
     }
 
@@ -127,23 +154,38 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     })
   }
 
-  bounceOff() {
-    this.body.touching.right ?
+  bounceOff(source) {
+    if(source.body) {
+      this.body.touching.right ?
       this.setVelocityX(-this.bounceVelocity, -this.bounceVelocity) :
       this.setVelocityX(this.bounceVelocity)
+    } else {
+      this.body.blocked.right ?
+      this.setVelocityX(-this.bounceVelocity, -this.bounceVelocity) :
+      this.setVelocityX(this.bounceVelocity)
+    }
 
     setTimeout(() => this.setVelocityY(-this.bounceVelocity), 0)      
   }
 
-  takesHit(inititator) {
+  takesHit(source) {
     if(this.hasBeenHit) return
+
+    this.health -= source.damage || source.properties.damage || 0
+
+    if(this.health <= 0) {
+      EventEmitter.emit('PLAYER_LOSE')
+      return
+    }
+
     this.hasBeenHit = true
-    this.bounceOff()
+    this.bounceOff(source)
+
     const hitAnim = this.playDamageTween()
 
-    this.health -= inititator.damage
     this.hp.decrease(this.health)
-    
+    source.deliversHit && source.deliversHit(this)
+
     this.scene.time.delayedCall(2000, () => { 
       this.hasBeenHit = false
       hitAnim.stop()

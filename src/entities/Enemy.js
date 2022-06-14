@@ -21,7 +21,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.timeSinceLastTurn = 0
     this.maxPatrolDistance = 200
     this.currentPatrolDistance = 0
-    this.damage = 10
+    this.damage = 50
     this.health = 100
     this.platformCollidersLayer = null
     this.rayGraphics = this.scene.add.graphics({ lineStyle: {
@@ -82,10 +82,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.platformCollidersLayer = platformCollidersLayer
   }
 
+  deliversHit() {}
+
   takesHit(source) {
     source.deliversHit(this)
     this.health -= source.damage
-
 
     if(this.health <= 0) {
       this.setTint(0xFF0000)

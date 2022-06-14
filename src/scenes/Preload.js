@@ -9,15 +9,33 @@ class Preload extends Phaser.Scene {
     this.load.tilemapTiledJSON('map', 'assets/maps/crystal_cave.json')
     this.load.image('tiles-1', 'assets/maps/tilesets/main_lev_build_1.png')
     this.load.image('tiles-2', 'assets/maps/tilesets/main_lev_build_2.png')
+    this.load.image('bg-spikes-dark', 'assets/bg_spikes_dark.png')
+    this.load.image('sky_play', 'assets/sky_play.png')    
 
     this.load.image('iceball-1', 'assets/weapons/iceball_001.png')
     this.load.image('iceball-2', 'assets/weapons/iceball_002.png')
 
-    this.load.image('fireball-1', 'assets/weapons/improved_fireball_impact_001.png')
-    this.load.image('fireball-2', 'assets/weapons/improved_fireball_impact_002.png')
-    this.load.image('fireball-3', 'assets/weapons/improved_fireball_impact_003.png')
+    this.load.image('fireball-1', 'assets/weapons/improved_fireball_001.png')
+    this.load.image('fireball-2', 'assets/weapons/improved_fireball_002.png')
+    this.load.image('fireball-3', 'assets/weapons/improved_fireball_003.png')
+    this.load.image('fireball-3', 'assets/weapons/improved_fireball_003.png')
+
+    this.load.image('diamond', 'assets/collectables/diamond.png')
+
+    this.load.image('diamond-1', 'assets/collectables/diamond_big_01.png')
+    this.load.image('diamond-2', 'assets/collectables/diamond_big_02.png')
+    this.load.image('diamond-3', 'assets/collectables/diamond_big_03.png')
+    this.load.image('diamond-4', 'assets/collectables/diamond_big_04.png')
+    this.load.image('diamond-5', 'assets/collectables/diamond_big_05.png')
+    this.load.image('diamond-6', 'assets/collectables/diamond_big_06.png')
 
     this.load.spritesheet('player', 'assets/player/move_sprite_1.png', {
+      frameWidth: 32,
+      frameHeight: 38,
+      spacing: 32
+    })
+
+    this.load.spritesheet('player-slide-sheet', 'assets/player/slide_sheet_2.png', {
       frameWidth: 32,
       frameHeight: 38,
       spacing: 32

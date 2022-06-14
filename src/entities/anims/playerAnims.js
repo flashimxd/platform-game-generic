@@ -28,7 +28,6 @@ export default (anims) => {
     frameRate: 4,
     repeat: 1
   })
-  
   anims.create({
     key: 'throw',
     frames: anims.generateFrameNumbers('player-throw', {
@@ -36,6 +35,15 @@ export default (anims) => {
       end: 7
     }),
     frameRate: 14,
+    repeat: 0
+  })
+  anims.create({
+    key: 'slide',
+    frames: anims.generateFrameNumbers('player-slide-sheet', {
+      start: 0,
+      end: 2
+    }),
+    frameRate: 20,
     repeat: 0
   })
 }
