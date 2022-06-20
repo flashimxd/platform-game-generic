@@ -76,12 +76,13 @@ class Play extends Phaser.Scene {
 
   createBG(map) {
     const bgObject = map.getObjectLayer('distance_bg').objects[0]
-    this.add.tileSprite(bgObject.x, bgObject.y, this.config.width, bgObject.height, 'bg-spikes-dark')
+
+    this.spikesImage = this.add.tileSprite(bgObject.x, bgObject.y, this.config.width, bgObject.height, 'bg-spikes-dark')
       .setOrigin(0,1)
       .setDepth(-10)
       .setScrollFactor(0, 1)
 
-      this.add.tileSprite(0, 0, this.config.width, 180, 'sky_play')
+    this.skyImage = this.add.tileSprite(0, 0, this.config.width, 180, 'sky_play')
       .setOrigin(0,0)
       .setDepth(-11)
       .setScale(1.1)
@@ -127,13 +128,18 @@ class Play extends Phaser.Scene {
   }
 
   createMap() {
-    const map = this.make.tilemap({ key: 'map'})
+    const map = this.make.tilemap({ key: 'level_1'})
     map.addTilesetImage('main_lev_build_1', 'tiles-1')
+    map.addTilesetImage('bg_spikes_tileset', 'bg-spikes-tileset')
     return map
   }
 
   createLayers(map) {
     const tileset = map.getTileset('main_lev_build_1')
+    const tilesetBg = map.getTileset('bg_spikes_tileset')
+
+    map.createStaticLayer('distance', tilesetBg).setDepth(-12)
+
     const platColliderLayer =  map.createStaticLayer('plataforms_colliders', tileset)
     const envLayer = map.createStaticLayer('env', tileset).setDepth(-2)
     const platLayer =  map.createStaticLayer('platforms', tileset)
@@ -183,6 +189,10 @@ class Play extends Phaser.Scene {
         alert('YOU WIN! (Nothing)')
         eolOverlap.active = false
       })
+  }
+  update() {
+    this.spikesImage.tilePositionX = this.cameras.main.scrollX * 0.3
+    this.skyImage.tilePositionX = this.cameras.main.scrollX * 0.1
   }
 }
 

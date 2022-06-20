@@ -12,7 +12,7 @@ const SHARED_CONFIG = {
   width: WIDTH,
   height: HEIGHT,
   zoomLevel: ZOOM_LEVEL,
-  debug: true,
+  debug: false,
   leftTopCornerPosition: {
     x: (WIDTH - (WIDTH / ZOOM_LEVEL)) / 2,
     y: (HEIGHT - (HEIGHT / ZOOM_LEVEL)) / 2
