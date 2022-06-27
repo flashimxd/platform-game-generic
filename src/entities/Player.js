@@ -36,6 +36,12 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.lastAtackTime = null
     this.cursors = this.scene.input.keyboard.createCursorKeys()
 
+    this.jumpSound = this.scene.sound.add('jump', { volume: 0.3 })
+    this.propjectileSound = this.scene.sound.add('projectile-launch', { volume: 0.3 })
+    this.swordSound = this.scene.sound.add('sword-slice', { volume: 0.3 })
+    this.stepSound = this.scene.sound.add('step', { volume: 0.3 })
+    this.swipeSound = this.scene.sound.add('swipe', { volume: 0.3 })
+
     this.lastDirection = Phaser.Physics.Arcade.FACING_RIGHT
 
     this.projectiles = new Projectiles(this.scene, 'iceball-1')
@@ -55,8 +61,20 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.setOrigin(0.5, 1)
 
     initAnimations(this.scene.anims)
+
     this.handleAttacks()
     this.handleMovements()
+
+    this.scene.time.addEvent({
+      delay: 350,
+      repeat: -1,
+      callbackScope: this,
+      callback: () => {
+        if(this.isPlayingAnims('run')) {
+          this.stepSound.play()
+        }
+      }
+    })
   }
 
   initEvents() {
@@ -66,6 +84,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
   handleAttacks() {
     this.scene.input.keyboard.on('keydown-Q', () => {
       this.play('throw', true)
+      this.propjectileSound.play()
       this.projectiles.fireProjectile(this, 'iceball')
     })
 
@@ -74,6 +93,8 @@ class Player extends Phaser.Physics.Arcade.Sprite {
       if(this.lastAtackTime &&
           this.lastAtackTime + this.meeleWeapon.attackSpeed > getTimeStamp()) return
 
+      // this.swipeSound.play()
+      this.swordSound.play()
       this.play('throw', true)
       this.meeleWeapon.attack(this)
       this.lastAtackTime = getTimeStamp()
@@ -120,6 +141,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
  
      if((isOnFloor || this.jumpCount < this.consecutiveJumps)
       && (isSpaceJustDown || isUpJustDown)) {
+        this.jumpSound.play()
         this.setVelocityY(-(this.playerSpeed * 1.8))
         this.jumpCount++
     }
@@ -186,7 +208,7 @@ class Player extends Phaser.Physics.Arcade.Sprite {
     this.hp.decrease(this.health)
     source.deliversHit && source.deliversHit(this)
 
-    this.scene.time.delayedCall(2000, () => { 
+    this.scene.time.delayedCall(2000, () => {
       this.hasBeenHit = false
       hitAnim.stop()
       this.clearTint()

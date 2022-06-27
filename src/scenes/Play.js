@@ -16,6 +16,8 @@ class Play extends Phaser.Scene {
     this.score = 0
     this.hud = new Hud(this, 0, 0)
 
+    this.playBGMusic()
+
     const map = this.createMap()
 
     initAnims(this.anims)
@@ -25,6 +27,7 @@ class Play extends Phaser.Scene {
     const player = this.createPlayer(playerZonesLayer.start)
     const enemies = this.createEnemies(layers.enemySpawns, layers.platColliderLayer)
     const collectables = this.createCollectables(layers.collectables)
+    this.coinPickUpSound = this.sound.add('coin-pickup', { volume: 0.3 })
 
     this.createBG(map)
 
@@ -44,6 +47,7 @@ class Play extends Phaser.Scene {
       }
     })
 
+    this.createBackButton()
     this.createEndOfLevel(playerZonesLayer.end, player)
     this.setUpFollowUpCameraOn(player)
 
@@ -71,7 +75,28 @@ class Play extends Phaser.Scene {
   onCollect(entity, collectable) {
     this.score += collectable.score
     this.hud.updateScoreBoard(this.score)
+    this.coinPickUpSound.play()
     collectable.disableBody(true, true)
+  }
+
+  createBackButton() {
+    const btn = this.add.image(this.config.rightBottomCornerPosition.x, this.config.rightBottomCornerPosition.y, 'back')
+      .setOrigin(1)
+      .setScrollFactor(0)
+      .setScale(2)
+      .setInteractive()
+
+    btn.on('pointerup', () => {
+      this.scene.start('MenuScene')
+    })
+  }
+
+  playBGMusic() {
+    if(this.sound.get('theme')) return
+    this.sound.add('theme', {
+      loop: true,
+      volume: 0.1
+    }).play()
   }
 
   createBG(map) {
@@ -91,7 +116,6 @@ class Play extends Phaser.Scene {
 
   createGameEvents() {
     EventEmitter.on('PLAYER_LOSE', () => {
-      console.log('player lose')
       this.scene.restart({ gameStatus: 'PLAYER_LOSE'})
     })
   }
@@ -120,6 +144,10 @@ class Play extends Phaser.Scene {
     }
   }
 
+  getCurrentLevel() {
+    return this.registry.get('level') || 1
+  }
+
   setUpFollowUpCameraOn(player) {
     const { height, width, mapOffset, zoomLevel } = this.config
     this.physics.world.setBounds(0,0, width + mapOffset, height + 200)
@@ -128,8 +156,9 @@ class Play extends Phaser.Scene {
   }
 
   createMap() {
-    const map = this.make.tilemap({ key: 'level_1'})
+    const map = this.make.tilemap({ key: `level_${this.getCurrentLevel()}`})
     map.addTilesetImage('main_lev_build_1', 'tiles-1')
+    // map.addTilesetImage('main_lev_build_2', 'tiles-2')
     map.addTilesetImage('bg_spikes_tileset', 'bg-spikes-tileset')
     return map
   }
@@ -186,8 +215,16 @@ class Play extends Phaser.Scene {
       .setOrigin(0.5, 1)
 
       const eolOverlap = this.physics.add.overlap(player, endOfLevelObj, () => {
-        alert('YOU WIN! (Nothing)')
         eolOverlap.active = false
+
+        if(this.registry.get('level') === this.config.lastLevel) {
+          this.scene.start('CreditsScene')
+          return
+        }
+
+        this.registry.inc('level', 1)
+        this.registry.inc('unlocked-levels', 1)
+        this.scene.restart({ gameStatus: 'LEVEL_COMPLETED' })
       })
   }
   update() {
